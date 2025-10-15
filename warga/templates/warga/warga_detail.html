@@ -1,0 +1,20 @@
+{% extends 'warga/base.html' %}
+{% block title %}Detail Warga{% endblock %}
+{% block content %}
+<h1>{{ object.nama_lengkap }}</h1>
+<p><strong>NIK:</strong> {{ object.nik }}</p>
+<p><strong>Alamat:</strong> {{ object.alamat }}</p>
+
+<hr>
+<h3>Daftar Pengaduan oleh {{ object.nama_lengkap }}</h3>
+<ul class="list-group">
+  {% for aduan in object.pengaduan.all %}
+  <li class="list-group-item">
+    <h5>{{ aduan.judul }} <small class="text-muted">({{ aduan.get_status_display }})</small></h5>
+    <p>{{ aduan.deskripsi }}</p>
+  </li>
+  {% empty %}
+  <li class="list-group-item">Warga ini belum pernah membuat pengaduan.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

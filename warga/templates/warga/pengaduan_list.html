@@ -1,0 +1,19 @@
+{% extends 'warga/base.html' %}
+{% block title %}Daftar Pengaduan{% endblock %}
+{% block content %}
+<h1>Daftar Semua Pengaduan</h1>
+<div class="list-group">
+  {% for p in object_list %}
+  <a href="{% url 'warga_detail' p.pelapor.pk %}" class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">{{ p.judul }}</h5>
+      <small>{{ p.tanggal_lapor|date:"Y-m-d H:i" }}</small>
+    </div>
+    <p class="mb-1">{{ p.deskripsi }}</p>
+    <small class="text-muted">Pelapor: {{ p.pelapor.nama_lengkap }} — Status: {{ p.get_status_display }}</small>
+  </a>
+  {% empty %}
+  <p>Belum ada pengaduan.</p>
+  {% endfor %}
+</div>
+{% endblock %}

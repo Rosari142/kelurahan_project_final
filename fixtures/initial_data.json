@@ -1,0 +1,42 @@
+[
+  {
+    "model": "warga.warga",
+    "pk": 1,
+    "fields": {
+      "nik": "0001",
+      "nama_lengkap": "Budi Santoso",
+      "alamat": "Jalan Merdeka No.1"
+    }
+  },
+  {
+    "model": "warga.warga",
+    "pk": 2,
+    "fields": {
+      "nik": "0002",
+      "nama_lengkap": "Siti Aminah",
+      "alamat": "Jalan Melati No.2"
+    }
+  },
+  {
+    "model": "warga.pengaduan",
+    "pk": 1,
+    "fields": {
+      "judul": "Jalan rusak",
+      "deskripsi": "Jalan di RT 01 banyak berlubang.",
+      "status": "BARU",
+      "tanggal_lapor": "2025-10-08T10:00:00Z",
+      "pelapor": 1
+    }
+  },
+  {
+    "model": "warga.pengaduan",
+    "pk": 2,
+    "fields": {
+      "judul": "Lampu jalan mati",
+      "deskripsi": "Lampu jalan depan RW 02 padam sejak semalam.",
+      "status": "BARU",
+      "tanggal_lapor": "2025-10-08T11:00:00Z",
+      "pelapor": 2
+    }
+  }
+]
