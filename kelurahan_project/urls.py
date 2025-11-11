@@ -4,7 +4,11 @@ from django.shortcuts import redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # ketika buka root ("/"), langsung arahkan ke daftar warga
+
+    # HTML
     path('', lambda request: redirect('warga_list')),
     path('warga/', include('warga.urls')),
+
+    # API (baru)
+    path('api/', include('warga.api_urls')),
 ]

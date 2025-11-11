@@ -35,3 +35,22 @@ class PengaduanCreateView(CreateView):
     template_name = 'warga/pengaduan_form.html'
     success_url = reverse_lazy('pengaduan_list')
 
+# === VIEW API (Baru) ==========================
+from rest_framework import viewsets, filters
+from .serializers import WargaSerializer, PengaduanSerializer
+
+class WargaViewSet(viewsets.ModelViewSet):
+    queryset = Warga.objects.all().order_by('nama_lengkap')
+    serializer_class = WargaSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['nik', 'nama_lengkap', 'alamat', 'no_telepon']
+    ordering_fields = ['nama_lengkap', 'nik']
+
+
+class PengaduanViewSet(viewsets.ModelViewSet):
+    queryset = Pengaduan.objects.all().order_by('-tanggal_lapor')
+    serializer_class = PengaduanSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['judul', 'deskripsi', 'status', 'pelapor__nama_lengkap']
+    ordering_fields = ['tanggal_lapor', 'status']
+
