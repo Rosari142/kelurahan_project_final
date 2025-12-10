@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Warga Kelurahan</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .warga-card { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .warga-card button { margin-right: 5px; }
+        form input { display: block; margin-bottom: 5px; padding: 5px; width: 300px; }
+        form button { padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <h1>Daftar Warga</h1>
+
+    <div>
+        <input type="text" id="search-input" placeholder="Cari berdasarkan nama...">
+        <button id="search-button">Cari</button>
+    </div>
+
+    <h2>Tambah Warga Baru</h2>
+    <form id="add-warga-form">
+        <input type="text" id="nik" placeholder="NIK" required>
+        <input type="text" id="nama_lengkap" placeholder="Nama Lengkap" required>
+        <input type="text" id="alamat" placeholder="Alamat" required>
+        <input type="text" id="no_telepon" placeholder="No. Telepon" required>
+        <button type="submit">Tambah Warga</button>
+    </form>
+
+    <div id="warga-list-container">
+        <p>Memuat data...</p>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const apiUrl = 'http://127.0.0.1:8000/api/warga/';
+    const token = 'b8ae367dfc9fca9e6974c7f41debdd80d886aa6a';
+    const wargaListContainer = document.getElementById('warga-list-container');
+    const addForm = document.getElementById('add-warga-form');
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+
+    function renderWarga(warga) {
+        const wargaDiv = document.createElement('div');
+        wargaDiv.className = 'warga-card';
+
+        const nama = document.createElement('h3');
+        nama.textContent = warga.nama_lengkap;
+
+        const nik = document.createElement('p');
+        nik.textContent = `NIK: ${warga.nik}`;
+
+        const alamat = document.createElement('p');
+        alamat.textContent = `Alamat: ${warga.alamat}`;
+
+        const telepon = document.createElement('p');
+        telepon.textContent = `No. Telepon: ${warga.no_telepon}`;
+
+        const updateBtn = document.createElement('button');
+        updateBtn.textContent = 'Update';
+        updateBtn.onclick = () => updateWarga(warga);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteWarga(warga.id);
+
+        wargaDiv.appendChild(nama);
+        wargaDiv.appendChild(nik);
+        wargaDiv.appendChild(alamat);
+        wargaDiv.appendChild(telepon);
+        wargaDiv.appendChild(updateBtn);
+        wargaDiv.appendChild(deleteBtn);
+
+        return wargaDiv;
+    }
+
+    function loadWarga(query='') {
+        let url = apiUrl;
+        if(query) url += `?search=${query}`;
+
+        fetch(url, { headers: { 'Authorization': `Token ${token}` } })
+        .then(res => res.json())
+        .then(data => {
+            wargaListContainer.innerHTML = '';
+            if(data.results.length === 0){
+                wargaListContainer.innerHTML = '<p>Tidak ada data warga.</p>';
+            } else {
+                data.results.forEach(warga => {
+                    const wargaEl = renderWarga(warga);
+                    wargaListContainer.appendChild(wargaEl);
+                });
+            }
+        })
+        .catch(err => {
+            wargaListContainer.innerHTML = '<p>Gagal memuat data. Pastikan server backend berjalan.</p>';
+            console.error(err);
+        });
+    }
+
+    addForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newWarga = {
+            nik: document.getElementById('nik').value,
+            nama_lengkap: document.getElementById('nama_lengkap').value,
+            alamat: document.getElementById('alamat').value,
+            no_telepon: document.getElementById('no_telepon').value
+        };
+
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}`
+            },
+            body: JSON.stringify(newWarga)
+        })
+        .then(res => {
+            if(!res.ok) throw new Error('Gagal menambah warga');
+            return res.json();
+        })
+        .then(() => {
+            addForm.reset();
+            loadWarga();
+            alert('Warga berhasil ditambahkan!');
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Gagal menambah warga.');
+        });
+    });
+
+    function deleteWarga(id) {
+        if(!confirm('Apakah Anda yakin ingin menghapus warga ini?')) return;
+
+        fetch(`${apiUrl}${id}/`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Token ${token}` }
+        })
+        .then(res => {
+            if(res.status === 204){
+                loadWarga();
+                alert('Warga berhasil dihapus!');
+            } else throw new Error('Gagal menghapus warga');
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Gagal menghapus warga.');
+        });
+    }
+
+    function updateWarga(warga) {
+        const newName = prompt('Nama lengkap:', warga.nama_lengkap);
+        if(!newName) return;
+
+        fetch(`${apiUrl}${warga.id}/`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}` 
+            },
+            body: JSON.stringify({
+                nik: warga.nik,
+                nama_lengkap: newName,
+                alamat: warga.alamat,
+                no_telepon: warga.no_telepon
+            })
+        })
+        .then(res => {
+            if(!res.ok) throw new Error('Gagal mengupdate warga');
+            return res.json();
+        })
+        .then(() => {
+            loadWarga();
+            alert('Warga berhasil diupdate!');
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Gagal mengupdate warga.');
+        });
+    }
+
+    searchButton.addEventListener('click', () => {
+        const query = searchInput.value.trim();
+        loadWarga(query);
+    });
+
+    // Load data awal
+    loadWarga();
+});
+</script>
+</body>
+</html>

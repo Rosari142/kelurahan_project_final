@@ -3,6 +3,9 @@ from django.urls import reverse_lazy
 from .models import Warga, Pengaduan
 from .forms import WargaForm, PengaduanForm
 
+# ==========================
+# VIEW HTML (TIDAK DIUBAH)
+# ==========================
 
 class WargaListView(ListView):
     model = Warga
@@ -35,7 +38,12 @@ class PengaduanCreateView(CreateView):
     template_name = 'warga/pengaduan_form.html'
     success_url = reverse_lazy('pengaduan_list')
 
-# === VIEW API (Baru) ==========================
+
+
+# ==========================
+# API VIEWSET (P6 PRAKTIKUM 5)
+# ==========================
+
 from rest_framework import viewsets, filters
 from .serializers import WargaSerializer, PengaduanSerializer
 
@@ -54,3 +62,19 @@ class PengaduanViewSet(viewsets.ModelViewSet):
     search_fields = ['judul', 'deskripsi', 'status', 'pelapor__nama_lengkap']
     ordering_fields = ['tanggal_lapor', 'status']
 
+
+
+# ==========================
+# API P6 – ListAPIView & DetailAPIView
+# ==========================
+
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+
+class WargaListAPIView(ListAPIView):
+    queryset = Warga.objects.all()
+    serializer_class = WargaSerializer
+
+
+class WargaDetailAPIView(RetrieveAPIView):
+    queryset = Warga.objects.all()
+    serializer_class = WargaSerializer
